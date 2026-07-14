@@ -11,6 +11,8 @@ export async function GET() {
       rows,
     });
   } catch (error) {
+    console.error(error);
+
     return NextResponse.json({
       success: false,
       message: "Database Connection Failed",
