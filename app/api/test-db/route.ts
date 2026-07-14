@@ -1,22 +1,26 @@
+import mysql from "mysql2/promise";
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
 
 export async function GET() {
   try {
-    const [rows] = await db.query("SELECT NOW() AS server_time");
-
-    return NextResponse.json({
-      success: true,
-      message: "Database Connected Successfully",
-      rows,
+    const conn = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     });
-  } catch (error) {
-    console.error(error);
 
+    await conn.query("SELECT 1");
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
     return NextResponse.json({
       success: false,
-      message: "Database Connection Failed",
-      error: error instanceof Error ? error.message : String(error),
+      code: err.code,
+      errno: err.errno,
+      sqlState: err.sqlState,
+      message: err.message,
     });
   }
 }
